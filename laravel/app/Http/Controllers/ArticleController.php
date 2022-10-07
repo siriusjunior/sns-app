@@ -2,46 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Article;
+use App\Http\Requests\ArticleRequest;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
     public function index()
     {
-        // テーブル内容を模したダミーデータ
-        $articles = [
-            (object)[
-                'id'=>1,
-                'title'=>'タイトル１',
-                'body'=>'本文１',
-                'created_at'=>now(),
-                'user'=>(object)[
-                    'id'=>1,
-                    'name'=>'ユーザー名１',
-                ],
-            ],
-            (object)[
-                'id'=>2,
-                'title'=>'タイトル２',
-                'body'=>'本文２',
-                'created_at'=>now(),
-                'user'=>(object)[
-                    'id'=>2,
-                    'name'=>'ユーザー名２',
-                ],
-            ],
-            (object)[
-                'id'=>3,
-                'title'=>'タイトル３',
-                'body'=>'本文３',
-                'created_at'=>now(),
-                'user'=>(object)[
-                    'id'=>3,
-                    'name'=>'ユーザー名３',
-                ],
-            ],
-        ];
-
+        $articles = Article::all()->sortByDesc('created_at');
         return view('articles.index',['articles'=> $articles]);
+    }
+
+    public function create()
+    {
+        return view('articles.create');
+    }
+
+    public function store(ArticleRequest $request, Article $article)
+    {
+        $article->title = $request->title;
+        $article->body = $request->body;
+
+        // Articleモデルの指定プロパティのみが安全に代⼊
+        $article->fill($request->all());
+        
+        // ログイン済みのユーザーが送信したリクエストをたどるuserメソッド
+        $article->user_id = $request->user()->id;
+        $article->save();
+        return redirect()->route('articles.index');
     }
 }
