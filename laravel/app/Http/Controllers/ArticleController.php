@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
+    // 初期処理に必ず実⾏
+    public function __construct()
+    {
+        // 第二引数はルーティングパラメータ
+        $this->authorizeResource(Article::class, 'article');
+    }
+
     public function index()
     {
         $articles = Article::all()->sortByDesc('created_at');
