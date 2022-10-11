@@ -71,5 +71,13 @@
     </div>
   </div>
   <!-- ./card-body -->
+  <div class="card-body pt-0 pb-2 pl-3">
+    <div class="card-text">
+      <article-like>
+      </article-like>
+      <!-- ArticleLikeではなく、ケバブケースarticle-likeで記述すること -->
+    </div>
+  </div>
+  <!-- ./card-body -->
 </div>
 <!-- ./card -->
