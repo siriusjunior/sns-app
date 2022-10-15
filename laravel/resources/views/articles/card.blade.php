@@ -75,6 +75,7 @@
     <div class="card-text">
       <article-like
         :initial-is-liked-by='@json($article->isLikedBy(Auth::user()))'
+        :initial-count-likes='@json($article->count_likes)'
       >
       </article-like>
       <!-- ArticleLikeではなく、ケバブケースarticle-likeで記述すること -->
