@@ -13,4 +13,9 @@ class Tag extends Model
         // 第⼆引数には中間テーブルのテーブル名,article_tag といった2つのモデル名の単数形で省略可能
         // 非省略形はbelongsToMany('App\Tag','article_tag'))
     }
+
+    protected $fillable = [
+        'name',
+    ];
+    
 }
