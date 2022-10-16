@@ -35,4 +35,11 @@ class Article extends Model
         return $this->likes->count();
         // $article->count_likesといった使い方
     }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Tag')->withTimestamps();
+        // 第⼆引数には中間テーブルのテーブル名,article_tag といった2つのモデル名の単数形で省略可能
+        // 非省略形はbelongsToMany('App\Tag','article_tag'))
+    }
 }
