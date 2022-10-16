@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Tag;
 use App\Http\Requests\ArticleRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
@@ -39,23 +40,32 @@ class ArticleController extends Controller
         $article->user_id = $request->user()->id;
         $article->save();
 
-        // passedValidationで整形したタグ名の配列が返ってきてる??
-        $request->tags->each(function($tagName)use($article){
+        // passedValidationで整形したタグ名の配列が返ってきてる?? ['USA', 'France']
+        $request->tags->each(function ($tagName) use ($article){
             $tag = Tag::firstOrCreate(['name' => $tagName]); //パラメータを指定,モデル$fillable確認
             $article->tags()->attach($tag); //記事とタグarticle_tagレコードへの保存
         });
-
         return redirect()->route('articles.index');
     }
 
     public function edit(Article $article)
     {
-        return view('articles.edit', ['article' => $article]);
+        // VueTagsInputのタグ表示のため、textキーの配列$tagNamesに戻す
+        $tagNames = $article->tags->map(function($tag){
+            return ['text' => $tag->name];
+        });
+        return view('articles.edit', ['article' => $article, 'tagNames' => $tagNames,]);
     }
 
     public function update(ArticleRequest $request, Article $article)
     {
         $article->fill($request->all())->save();
+        //中間テーブルのレコードarticle_tag全削除
+        $article->tags()->detach();
+        $request->tags->each(function($tagName)use($article){
+            $tag = Tag::firstOrCreate(['name'=>$tagName]);
+            $article->tags()->attach($tag); //article_tagを作成
+        });
         return redirect()->route('articles.index');
     }
 

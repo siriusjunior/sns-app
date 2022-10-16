@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Article extends Model
 {
+    //  fillableの指定プロパティのみを$articleの各プロパティに代⼊
     protected $fillable = [
         'title',
         'body',
