@@ -37,17 +37,6 @@
       return {
         tag: '',
         tags: this.initialTags,
-        autocompleteItems: [{
-          text: 'Spain',
-          }, {
-          text: 'France',
-          }, {
-          text: 'USA',
-          }, {
-          text: 'Germany',
-          }, {
-          text: 'China',
-        }],
       };
     },
     computed: {
