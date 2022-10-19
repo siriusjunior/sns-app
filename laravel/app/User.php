@@ -51,8 +51,8 @@ class User extends Authenticatable
     {
         //第1引数に関係モデル,
         //第2引数に中間テーブル名,
-        //第3引数にリレーション元にあるid(フォローしている人(受動者)たち,followsテーブルよりUsersのFKで指定),
-        //第4引数にリレーション先にある,紐づいているid(フォローされている人たち(能動者),followsテーブルよりUsersのFKで指定),
+        //第3引数にリレーション元にあるid(フォローされている人(self),followsテーブルよりUsersのFKで指定),
+        //第4引数にリレーション先にある,紐づいているid(フォローしている人たち(能動者),followsテーブルよりUsersのFKで指定),
         //中間テーブルより第3引数に紐づいている多数の第4引数のレコード
         return $this->belongsToMany('App\User', 'follows', 'followee_id', 'follower_id')->withTimestamps();
     }
@@ -62,8 +62,8 @@ class User extends Authenticatable
     {
         //第1引数に関係モデル,
         //第2引数に中間テーブル名,
-        //第3引数にリレーション元にあるid(フォローされている人(自分),followsテーブルよりUsersのFKで指定),
-        //第4引数にリレーション先にある,紐づいているid(フォローしている人たち(能動者),followsテーブルよりUsersのFKで指定),
+        //第3引数にリレーション元にあるid(フォローしている人たち(能動者),followsテーブルよりUsersのFKで指定),
+        //第4引数にリレーション先にある,紐づいているid(フォローされている人たち(受動者),followsテーブルよりUsersのFKで指定),
         //中間テーブルより第3引数に紐づいている多数の第4引数のレコード
         return $this->belongsToMany('App\User', 'follows', 'follower_id', 'followee_id')->withTimestamps();
     }
