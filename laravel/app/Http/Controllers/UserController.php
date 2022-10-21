@@ -10,9 +10,24 @@ class UserController extends Controller
     public function show(string $name)
     {
         $user = User::where('name', $name)->first();
+
+        $articles = $user->articles->sortByDesc('created_at');
         
         return view('users.show', [
             'user' => $user,
+            'articles' => $articles,
+        ]);
+    }
+
+    public function likes(string $name)
+    {
+        $user = User::where('name', $name)->first();
+
+        $articles = $user->likes->sortByDesc('created_at');
+        
+        return view('users.likes', [
+            'user' => $user,
+            'articles' => $articles,
         ]);
     }
 
@@ -27,7 +42,7 @@ class UserController extends Controller
 
         $request->user()->followings()->detach($user);
         $request->user()->followings()->attach($user);
-
+        //userモデルのfollowingsメソッドの第4引数のリレーション先に追加
         return ['name' => $name];
     }
 

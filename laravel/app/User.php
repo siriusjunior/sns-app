@@ -7,6 +7,7 @@ use App\Mail\BareMail;
 use App\Notifications\PasswordResetNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -46,7 +47,12 @@ class User extends Authenticatable
         $this->notify(new PasswordResetNotification($token, new BareMail()));
     }
 
-    // 当該UserをフォローしているUser一覧を取得
+    public function articles(): HasMany
+    {
+        return $this->hasMany('App\Article');
+    }
+
+    // 当該Userをフォローしている関連を取得
     public function followers(): BelongsToMany
     {
         //第1引数に関係モデル,
@@ -57,15 +63,20 @@ class User extends Authenticatable
         return $this->belongsToMany('App\User', 'follows', 'followee_id', 'follower_id')->withTimestamps();
     }
     
-    // 当該UserがフォローしているUser一覧を取得
+    // 当該Userがフォローしている関連を取得
     public function followings(): BelongsToMany
     {
         //第1引数に関係モデル,
         //第2引数に中間テーブル名,
-        //第3引数にリレーション元にあるid(フォローしている人たち(能動者),followsテーブルよりUsersのFKで指定),
+        //第3引数にリレーション元にあるid(フォローしている人(self),followsテーブルよりUsersのFKで指定),
         //第4引数にリレーション先にある,紐づいているid(フォローされている人たち(受動者),followsテーブルよりUsersのFKで指定),
         //中間テーブルより第3引数に紐づいている多数の第4引数のレコード
         return $this->belongsToMany('App\User', 'follows', 'follower_id', 'followee_id')->withTimestamps();
+    }
+
+    public function likes(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Article','likes')->withTimestamps();
     }
 
     public function isFollowedBy(?User $user): bool
@@ -73,5 +84,15 @@ class User extends Authenticatable
         return $user
         ? (bool)$this->followers->where('id', $user->id)->count()
         : false;
+    }
+
+    public function getCountFollowersAttribute(): int
+    {
+        return $this->followers->count();
+    }
+    
+    public function getCountFollowingsAttribute(): int
+    {
+        return $this->followings->count();
     }
 }
