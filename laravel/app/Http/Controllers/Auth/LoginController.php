@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
@@ -42,5 +44,20 @@ class LoginController extends Controller
     public function redirectToProvider(string $provider)
     {
         return Socialite::driver($provider)->redirect();
+    }
+
+    public function handleProviderCallback(Request $request, string $provider)
+    {
+        // Googleから取得するユーザー情報
+        $providerUser = Socialite::driver($provider)->stateless()->user();
+        // Googleから取得するユーザー情報からメールアドレスを取出し、同メールに紐づくユーザー抽出
+        $user = User::where('email', $providerUser->getEmail())->first();
+        if ($user) {
+            // 当該ユーザーのログイン処理,ログイン状態維持(true)
+            $this->guard()->login($user, true);
+            // ログイン後の画⾯へ遷移(cf.laravel/vendor/laravel/framework/src/Illuminate/Foundation/Auth/AuthenticatesUsers.php)
+            return $this->sendLoginResponse($request);
+        }
+        // $userがnullの場合の処理は次のパートでここに書く予定
     }
 }
