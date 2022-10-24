@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Socialite\Facades\Socialite;
 
 class RegisterController extends Controller
 {
@@ -70,4 +72,35 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
     }
+
+    public function showProviderUserRegistrationForm(Request $request, string $provider)
+    {
+        // Googleから発⾏済みのトークンを使用,グーグルのアカウント選択後のリダイレクトにつき
+        $token = $request->token;
+        $providerUser = Socialite::driver($provider)->userFromToken($token);
+            return view('auth.social_register', [
+                'provider' => $provider,
+                'email' => $providerUser->getEmail(),
+                'token' => $token,
+            ]);
+    }
+
+    public function registerProviderUser(Request $request, string $provider)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'alpha_num', 'min:3', 'max:16', 'unique:users'],
+            'token' => ['required', 'string'],
+        ]);
+        $token = $request->token; //$requestもそうだがパラメーター内のname属性に一致
+        $providerUser = Socialite::driver($provider)->userFromToken($token);
+        $user = User::create([
+                'name' => $request->name,
+                'email' => $providerUser->getEmail(),
+                'password' => null,
+            ]);
+        $this->guard()->login($user, true);
+        //cf.laravel/vendor/laravel/framework/src/Illuminate/Foundation/Auth/RegistersUsers.php
+        return $this->registered($request, $user)
+            ?: redirect($this->redirectPath());
+        }
 }

@@ -58,6 +58,11 @@ class LoginController extends Controller
             // ログイン後の画⾯へ遷移(cf.laravel/vendor/laravel/framework/src/Illuminate/Foundation/Auth/AuthenticatesUsers.php)
             return $this->sendLoginResponse($request);
         }
-        // $userがnullの場合の処理は次のパートでここに書く予定
+        // $providerUserはいるが本サービス上に紐づく$userがnullの場合
+        return redirect()->route('register.{provider}', [
+            'provider' => $provider,
+            'email' => $providerUser->getEmail(),
+            'token' => $providerUser->token,
+        ]);
     }
 }
